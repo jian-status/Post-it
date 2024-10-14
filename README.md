@@ -1,8 +1,11 @@
-# React + Vite
+A Post-It app. Currently a work in progress.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Features:
+1. Click anywhere on screen to add a Post-It
+  1. 'ESC' keyboard shortcut
+2. Drag a Post-It to move it
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Upcoming:
+1. Editing a Post-It's text
+2. Change the color of the Post-It
+3. Resize option# Post-it
