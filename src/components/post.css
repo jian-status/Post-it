@@ -1,0 +1,14 @@
+#editButtons {
+  height: 30px;
+  align-items: center;
+}
+button {
+  height: 25px;
+  align-content: center;
+}
+svg {
+  height: 100%;
+}
+textarea {
+  resize: none;
+}

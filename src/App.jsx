@@ -1,25 +1,38 @@
 import { useState, useEffect, useRef } from 'react'
 import './App.css'
+import Post from './components/Post';
+
 
 function App() {
   const [posts, setPosts] = useState([]);
   const [isCreating, setCreating] = useState(false);
-  const [body, setbody] = useState(""); // creation
+  const [body, setBody] = useState(""); // creation
   const [coordinates, setCoordinates] = useState({})
-  const width = 200, height = 200;
+  
+  function generateColor() { // hex
+    const randomColor = Math.floor(Math.random()*16777215).toString(16);
+    return '#' + randomColor;
+    }
+
   function captureCoordinates(mouseX, mouseY) {
     setCreating(true);
     setCoordinates({x: mouseX, y: mouseY});
   }
   function create_post() {
-    setPosts(posts => [...posts, {x: coordinates.x, y: coordinates.y, body: body}]);
-    setbody("");
+    setPosts(posts => [...posts, {x: coordinates.x, y: coordinates.y, body: body, hex: generateColor()}]);
+    setBody("");
     setCoordinates({});
     setCreating(false);
   }
-  function edit_post(event, post, id) {
-    event.stopPropagation();
-    console.log("I am post it #" + id)
+  function saveEdits(id, textChange, colorChange) {
+    const updatedPosts = posts.map((post, index) => {
+      if (index == id) {
+        const newColor = colorChange ? colorChange : post.hex;
+        return {...post, body: textChange, hex: newColor};
+      } 
+      else return post;
+    })
+    setPosts(updatedPosts);
   }
   function handleKeyDown(event) {
     if (event.key == "Escape" && isCreating == true) {
@@ -31,7 +44,7 @@ function App() {
     const updatedPosts = posts.map((post, index) => {
       console.log(index + " " + id)
       if (index == id) {
-        return {x: event.clientX, y: event.clientY, body: post.body}
+        return {...post, x: event.clientX, y: event.clientY}
       }
       return post;
     })
@@ -69,32 +82,15 @@ function App() {
                 height: "150px",
                 backgroundColor: "rgba(0,0,0,0.05)",
               }}
-              onChange={(e) => setbody(e.target.value)}
+              onChange={(e) => setBody(e.target.value)}
               value={body}
             />
             <p>Click anywhere outside the Post-It to finish! Or press your 'Esc' key!</p>
         </div>
       : 
-      posts.map((post, id) =>
-        <div
-          key={id}
-          onClick={event => edit_post(event, post, id)}
-          draggable="true"
-          onDragEnd={event => updateCoordinates(event, id)}
-          style={{
-            position: "absolute", 
-            top: post.y - height/2, 
-            left: post.x - width/2, 
-            width: width, 
-            height: height, 
-            backgroundColor: "white",
-            border: "1px solid rgba(38, 50, 53, 0.8)",
-            borderRadius: "5px",
-            boxShadow: "0px 0px 26px 0px rgba(0,0,0,0.5)",
-            padding: "3px",
-            boxSizing: "border-box"
-            }}>
-              {post.body}
+      posts.map((post, index) =>
+        <div key={index}>
+          <Post post={post} id={index} updateCoordinates={updateCoordinates} saveEdits={saveEdits}/>
         </div>
       )}
     </div>
