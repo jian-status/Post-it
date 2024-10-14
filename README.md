@@ -9,4 +9,7 @@ Features:
 5. Random color for any newly generated Post-It.
 
 Upcoming:
-2. Resize option for Post-it
+1. Make Post-It resizable (will likely be predefined options)
+2. Add Delete option
+3. Add List view? (Might be hard)
+4. Make Post-It collapsible
