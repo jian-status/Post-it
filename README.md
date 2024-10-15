@@ -2,7 +2,7 @@ A Post-It app. Currently a work in progress.
 
 Features:
 1. Click anywhere on the page to add a Post-It.
-- 1. 'ESC' keyboard shortcut.
+    - 'ESC' keyboard shortcut.
 2. Drag a Post-It to move it.
 3. Click on a Post-It to start editing it.
 4. Change the color of the Post-It in the editing mode.
@@ -13,7 +13,7 @@ Features:
 9. Post-It will not go out of bounds of the viewport while collapsed.
     - A collapsed Post-It will be able to reach the bounds (Post-It height will be updated as it resizes)
 10. Default Post-It size (200px * 200px) will not go out of bounds of the viewport.
-    - Does not support when Post-It resizes due to a high volume of text.
+    - Does not support non default sizes, such as when Post-It resizes due to a high volume of text.
 
 Upcoming:
 1. Make Post-It resizable (will likely be predefined options)
