@@ -19,16 +19,22 @@ function App() {
     setCoordinates({x: mouseX, y: mouseY});
   }
   function create_post() {
-    setPosts(posts => [...posts, {x: coordinates.x, y: coordinates.y, body: body, hex: generateColor()}]);
+    setPosts(posts => [
+      ...posts, {
+        x: coordinates.x, 
+        y: coordinates.y, 
+        body: body, 
+        hex: generateColor(),
+        title: `Post-It #${posts.length}`
+      }]);
     setBody("");
     setCoordinates({});
     setCreating(false);
   }
-  function saveEdits(id, textChange, colorChange) {
+  function saveEdits(id, textChange, colorChange, titleChange) {
     const updatedPosts = posts.map((post, index) => {
       if (index == id) {
-        const newColor = colorChange ? colorChange : post.hex;
-        return {...post, body: textChange, hex: newColor};
+        return {...post, body: textChange, hex: colorChange, title: titleChange};
       } 
       else return post;
     })
@@ -39,12 +45,17 @@ function App() {
       create_post();
     }
   }
-  function updateCoordinates(event, id) {
-    console.log(event.clientX + " " + event.clientY);
+  function updateCoordinates(newX, newY, id, isCollapsed) {
+    const height = isCollapsed ? 41: 200, width = 253;
+    if (newX - width/2 < 0) {newX = width/2 - 3;}
+    if (newX + width/2 > window.innerWidth) {newX = window.innerWidth - width/2 - 15}
+    if (newY - height/2 < 0) {newY = height/2 + 3;}
+    console.log(newY + height/2);
+    if (newY + height/2 > window.innerHeight) {console.log("bruh"); newY = window.innerHeight - height/2 - 1}
+    console.log(newY);
     const updatedPosts = posts.map((post, index) => {
-      console.log(index + " " + id)
       if (index == id) {
-        return {...post, x: event.clientX, y: event.clientY}
+        return {...post, x: newX, y: newY}
       }
       return post;
     })
@@ -87,11 +98,9 @@ function App() {
             />
             <p>Click anywhere outside the Post-It to finish! Or press your 'Esc' key!</p>
         </div>
-      : 
+      :
       posts.map((post, index) =>
-        <div key={index}>
-          <Post post={post} id={index} updateCoordinates={updateCoordinates} saveEdits={saveEdits}/>
-        </div>
+          <Post post={post} id={index} updateCoordinates={updateCoordinates} saveEdits={saveEdits} posts={posts} setPosts={setPosts}/>
       )}
     </div>
   )

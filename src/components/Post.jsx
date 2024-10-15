@@ -1,21 +1,23 @@
 import { useState } from 'react';
-import { CompactPicker } from 'react-color';
-import { MenuSVG } from '../assets/svgs';
+import { MenuSVG, PaletteSVG, ResizeSVG, CollapsedSVG, NotCollapsedSVG } from '../assets/svgs';
+import ColorPicker from './ColorPicker';
+import Title from './Header';
+
 import "./post.css";
 
-const width = 245, height = 200;
 
-function Edit ({id, handleEdit, initialBody}) {
+function Edit ({post, id, handleEdit, initialBody}) {
   const [text, setText] = useState(initialBody);
-  const [color, setColor] = useState();
+  const [color, setColor] = useState(post.hex);
   const [showColorPicker, toggleColorPicker] = useState(false);
+  const [moreButtons, toggleMoreButtons] = useState(false);
+  const [title, setTitle] = useState(post.title);
+
+  const width = 245, height = 200; // width & height of post
+
   return (
     <>
-      <p style={{
-        margin: "7px 0px 7px 0px",
-      }}>
-        <b style={{textAlign: "center", width: "100%", display: "inline-block"}}>Editing Post-It #{id}</b>
-      </p>
+      <Title title={title} setTitle={setTitle} />
       <textarea
       onChange={(e) => setText(e.target.value)}
       value={text}
@@ -26,62 +28,52 @@ function Edit ({id, handleEdit, initialBody}) {
         textOverflow: "ellipsis"
       }}/>
       <div id="editButtons" style={{display: "flex", gap: "5px"}}>
-        <button onClick={() => toggleColorPicker(!showColorPicker)}>
-          <MenuSVG height="15px" width="15px" />
+        <button onClick={() => toggleMoreButtons(!moreButtons)}>
+          <MenuSVG width="15px" height="15px" />
         </button>
-        <button onClick={(event) => handleEdit(event, text, color)}>
+        <button onClick={(event) => handleEdit(event, text, color, title)}>
           Save
         </button>
       </div>
-      <div id="colorPicker" style={{marginTop:"3px"}}>
-        {showColorPicker ? 
-            <caption style={{fontSize: "10px", width: width, wordWrap: "break-word", marginLeft: "-3px"}}>
-              You must "save" to put your color changes into effect
-            </caption>
-            :
-            ""}
-        <div
-          style={{
-            position: "relative",
-            //top: height,
-            //left: 0
-          }}
-          draggable="false"
-        >
-          {showColorPicker ?
-            <div>
-              <CompactPicker
-                color={color}
-                onChangeComplete={(color) => {setColor(color.hex); console.log(color.hex)}}
-              />
-            </div>
-          : ""}
-        </div>
-      </div>
+      {moreButtons ?       
+        <div style={{display: "flex", gap: "5px"}}>
+          <button id="color" onClick={() => toggleColorPicker(!showColorPicker)}>
+            <PaletteSVG height="15px" width="15px" />
+          </button>
+          <button id="resize">
+            <ResizeSVG height="15px" width="15px"/>
+          </button>
+        </div> : ""}
+      <ColorPicker showColorPicker={showColorPicker} setColor={setColor} color={color} width={width}/>
     </>
   )
 }
 
-export default function Post({post, id, updateCoordinates, saveEdits}) {
+export default function Post({post, id, updateCoordinates, saveEdits, posts, setPosts}) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isCollapsed, toggleCollapse] = useState(false);
 
-  function handleEdit(event, text, color) {
+  const width = 245, height = isCollapsed ? 43 : 200; // width & height of post
+
+  function handleEdit(event, text, color, title) {
     event.stopPropagation();
-    saveEdits(id, text, color);
+    saveEdits(id, text, color, title);
     setIsEditing(false);
   }
+
   return (
     <div
+      key={id}
       onClick={event => {event.stopPropagation(); setIsEditing(true)}}
       draggable="true"
-      onDragEnd={event => updateCoordinates(event, id)}
+      onDragEnd={event => updateCoordinates(event.clientX, event.clientY, id, isCollapsed)}
       style={{
         position: "absolute", 
         top: post.y - height/2, 
         left: post.x - width/2, 
         width: width,
-        minHeight: height,
-        height: "auto", 
+        minHeight: isCollapsed ? "33px": height,
+        height: isCollapsed ? "fit-content" : "auto",
         backgroundColor: post.hex,
         opacity: "0.8",
         border: "1px solid rgba(38, 50, 53, 0.8)",
@@ -90,9 +82,28 @@ export default function Post({post, id, updateCoordinates, saveEdits}) {
         padding: "3px",
         //boxSizing: "border-box",
         color: "white",
+
         }}>
+          <div>
+            <button
+              style={{
+                position: "absolute", 
+                left: width + 6, 
+                top: 6, 
+                border: "1px solid rgba(38, 50, 53, 0.8)", 
+                borderRadius: "0px 5px 5px 0px",
+                width: "10px",
+                display: "flex",
+                justifyContent: "center",
+                padding: "0px",
+                }}
+                onClick={event => {event.stopPropagation(); toggleCollapse(!isCollapsed)}}
+                >
+                    {isCollapsed ? <NotCollapsedSVG height="5px" width="10px"/> : <CollapsedSVG height="5px" width="10px"/>}
+            </button>
+          </div>
           {isEditing ? 
-            <Edit id={id} handleEdit={handleEdit} initialBody={post.body}/> 
+            <Edit post={post} id={id} handleEdit={handleEdit} initialBody={post.body}/> 
             : 
             <div style={{
               textWrap: "pretty",
@@ -100,7 +111,9 @@ export default function Post({post, id, updateCoordinates, saveEdits}) {
               hyphens: "auto",
               textOverflow: "ellipsis",
             }}>
-              {post.body}
+              
+              <b>{post.title}</b>
+              {isCollapsed ? '' : <p>{post.body}</p>}
             </div>
             }
     </div>
