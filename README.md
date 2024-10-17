@@ -1,4 +1,5 @@
-A Post-It app. Currently a work in progress.
+A Post-It app. Please use a Chrome browser. Currently a work in progress.
+
 
 Features:
 1. Click anywhere on the page to add a Post-It.
@@ -10,12 +11,12 @@ Features:
 6. Avoids text overflow by resizing Post-It.
 7. Click the title in editing mode to change it.
 8. Post-It is collapsible by clicking the button to the right of the Post-It.
-9. Post-It will not go out of bounds of the viewport while collapsed.
-    - A collapsed Post-It will be able to reach the bounds (Post-It height will be updated as it resizes)
-10. Default Post-It size (200px * 200px) will not go out of bounds of the viewport.
-    - Does not support non default sizes, such as when Post-It resizes due to a high volume of text.
+10. A collapsed Post-It will be able to reach the bounds (Post-It height will be updated as it resizes).
+11. Post-It will always stay inside the viewport.
+12. Delete Post-It in editing mode or delete all Post-Its in the sidebar.
+
 
 Upcoming:
-1. Make Post-It resizable (will likely be predefined options)
-2. Add Delete option
-3. Add List view? (Might be hard)
+1. Add List view? (Might be hard)
+2. Tooltips
+3. Select multiple Post-Its and stack them.

@@ -1,8 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+import { Tooltip } from 'react-tooltip';
+
+import { useState, useEffect } from 'react'
 import './App.css'
 import Post from './components/Post';
-
-
+import SidebarR from './components/SidebarR';
+import { v4 as uuid } from 'uuid'
 function App() {
   const [posts, setPosts] = useState([]);
   const [isCreating, setCreating] = useState(false);
@@ -21,19 +23,20 @@ function App() {
   function create_post() {
     setPosts(posts => [
       ...posts, {
+        id: uuid(),
         x: coordinates.x, 
         y: coordinates.y, 
         body: body, 
         hex: generateColor(),
-        title: `Post-It #${posts.length}`
+        title: "Post-It"
       }]);
     setBody("");
     setCoordinates({});
     setCreating(false);
   }
   function saveEdits(id, textChange, colorChange, titleChange) {
-    const updatedPosts = posts.map((post, index) => {
-      if (index == id) {
+    const updatedPosts = posts.map(post => {
+      if (post.id == id) {
         return {...post, body: textChange, hex: colorChange, title: titleChange};
       } 
       else return post;
@@ -50,11 +53,9 @@ function App() {
     if (newX - width/2 < 0) {newX = width/2 - 3;}
     if (newX + width/2 > window.innerWidth) {newX = window.innerWidth - width/2 - 15}
     if (newY - height/2 < 0) {newY = height/2 + 3;}
-    console.log(newY + height/2);
-    if (newY + height/2 > window.innerHeight) {console.log("bruh"); newY = window.innerHeight - height/2 - 1}
-    console.log(newY);
-    const updatedPosts = posts.map((post, index) => {
-      if (index == id) {
+    if (newY + height/2 > window.innerHeight) {newY = window.innerHeight - height/2 - 1}
+    const updatedPosts = posts.map(post => {
+      if (post.id == id) {
         return {...post, x: newX, y: newY}
       }
       return post;
@@ -66,9 +67,11 @@ function App() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isCreating, body]); // prevent stale closure
   return (
-    <div id="app" onClick={event => isCreating ? create_post() : captureCoordinates(event.clientX, event.clientY)}>
-      {isCreating
-       ? 
+    <div id="app" 
+      onClick={event => isCreating ? create_post() : captureCoordinates(event.clientX, event.clientY)}
+    >
+      <div className="bg"></div>
+      {isCreating ? 
         <div
           onClick={event => event.stopPropagation()}
           style={{
@@ -99,9 +102,15 @@ function App() {
             <p>Click anywhere outside the Post-It to finish! Or press your 'Esc' key!</p>
         </div>
       :
-      posts.map((post, index) =>
-          <Post post={post} id={index} updateCoordinates={updateCoordinates} saveEdits={saveEdits} posts={posts} setPosts={setPosts}/>
-      )}
+      <div onClick={event => event.stopPropagation()}> 
+        {posts.map(post =>
+          <div key={post.id}>
+            <Post post={post} updateCoordinates={updateCoordinates} saveEdits={saveEdits} posts={posts} setPosts={setPosts}/>
+          </div>
+        )}
+        <SidebarR setPosts={setPosts}/>
+      </div>
+      }
     </div>
   )
 }

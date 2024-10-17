@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { MenuSVG, PaletteSVG, ResizeSVG, CollapsedSVG, NotCollapsedSVG } from '../assets/svgs';
+import { MenuSVG, PaletteSVG, CollapsedSVG, NotCollapsedSVG, TrashSVG } from '../assets/svgs';
 import ColorPicker from './ColorPicker';
 import Title from './Header';
 
 import "./post.css";
+import { Tooltip } from 'react-tooltip';
 
-
-function Edit ({post, id, handleEdit, initialBody}) {
+function Edit ({post, handleEdit, initialBody, posts, setPosts}) {
   const [text, setText] = useState(initialBody);
   const [color, setColor] = useState(post.hex);
   const [showColorPicker, toggleColorPicker] = useState(false);
@@ -15,6 +15,11 @@ function Edit ({post, id, handleEdit, initialBody}) {
 
   const width = 245, height = 200; // width & height of post
 
+  function deletePost() {
+    const curr_id = post.id;
+    //const updatedPosts = posts.filter(post.id == id);
+    setPosts(posts.filter(post => {console.log("filtering " + post); return post.id != curr_id}));
+  }
   return (
     <>
       <Title title={title} setTitle={setTitle} />
@@ -27,12 +32,16 @@ function Edit ({post, id, handleEdit, initialBody}) {
         boxSizing: "border-box",
         textOverflow: "ellipsis"
       }}/>
+      <div onClick={event => event.stopPropagation()}>
       <div id="editButtons" style={{display: "flex", gap: "5px"}}>
         <button onClick={() => toggleMoreButtons(!moreButtons)}>
           <MenuSVG width="15px" height="15px" />
         </button>
-        <button onClick={(event) => handleEdit(event, text, color, title)}>
+        <button onClick={() => handleEdit(text, color, title)}>
           Save
+        </button>
+        <button onClick={deletePost}>
+          <TrashSVG />
         </button>
       </div>
       {moreButtons ?       
@@ -40,33 +49,28 @@ function Edit ({post, id, handleEdit, initialBody}) {
           <button id="color" onClick={() => toggleColorPicker(!showColorPicker)}>
             <PaletteSVG height="15px" width="15px" />
           </button>
-          <button id="resize">
-            <ResizeSVG height="15px" width="15px"/>
-          </button>
         </div> : ""}
       <ColorPicker showColorPicker={showColorPicker} setColor={setColor} color={color} width={width}/>
+      </div>
     </>
   )
 }
 
-export default function Post({post, id, updateCoordinates, saveEdits, posts, setPosts}) {
+export default function Post({post, updateCoordinates, saveEdits, posts, setPosts}) {
   const [isEditing, setIsEditing] = useState(false);
   const [isCollapsed, toggleCollapse] = useState(false);
 
   const width = 245, height = isCollapsed ? 43 : 200; // width & height of post
 
-  function handleEdit(event, text, color, title) {
-    event.stopPropagation();
-    saveEdits(id, text, color, title);
+  function handleEdit(text, color, title) {
+    saveEdits(post.id, text, color, title);
     setIsEditing(false);
   }
-
   return (
     <div
-      key={id}
-      onClick={event => {event.stopPropagation(); setIsEditing(true)}}
+      onClick={() => {setIsEditing(true)}}
       draggable="true"
-      onDragEnd={event => updateCoordinates(event.clientX, event.clientY, id, isCollapsed)}
+      onDragEnd={event => updateCoordinates(event.clientX, event.clientY, post.id, isCollapsed)}
       style={{
         position: "absolute", 
         top: post.y - height/2, 
@@ -80,10 +84,8 @@ export default function Post({post, id, updateCoordinates, saveEdits, posts, set
         borderRadius: "5px",
         boxShadow: "0px 0px 26px 0px rgba(0,0,0,0.5)",
         padding: "3px",
-        //boxSizing: "border-box",
         color: "white",
-
-        }}>
+      }}>
           <div>
             <button
               style={{
@@ -99,11 +101,11 @@ export default function Post({post, id, updateCoordinates, saveEdits, posts, set
                 }}
                 onClick={event => {event.stopPropagation(); toggleCollapse(!isCollapsed)}}
                 >
-                    {isCollapsed ? <NotCollapsedSVG height="5px" width="10px"/> : <CollapsedSVG height="5px" width="10px"/>}
+                  {isCollapsed ? <NotCollapsedSVG height="5px" width="10px"/> : <CollapsedSVG height="5px" width="10px"/>}
             </button>
           </div>
           {isEditing ? 
-            <Edit post={post} id={id} handleEdit={handleEdit} initialBody={post.body}/> 
+            <Edit post={post} handleEdit={handleEdit} initialBody={post.body} posts={posts} setPosts={setPosts}/>
             : 
             <div style={{
               textWrap: "pretty",
@@ -111,7 +113,6 @@ export default function Post({post, id, updateCoordinates, saveEdits, posts, set
               hyphens: "auto",
               textOverflow: "ellipsis",
             }}>
-              
               <b>{post.title}</b>
               {isCollapsed ? '' : <p>{post.body}</p>}
             </div>
