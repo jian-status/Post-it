@@ -1,5 +1,7 @@
 A Post-It app. Please use a Chrome browser. Currently a work in progress.
 
+Demo
+1. https://youtu.be/b9IyUa1UAqA
 
 Features:
 1. Click anywhere on the page to add a Post-It.
